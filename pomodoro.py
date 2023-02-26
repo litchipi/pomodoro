@@ -26,6 +26,8 @@ LOGTIME_COLOR = 96
 
 LOGS_HISTORY_MAX = 500
 
+PROGRESS_CHARS = ["▐", "█", "░", "▌"]
+
 def playsound(file, wait=False):
     wave_obj = simpleaudio.WaveObject.from_wave_file(file)
     play_obj = wave_obj.play()
@@ -136,9 +138,9 @@ class Pomodoro:
 
         ncols = termsize.columns - len(name) - 4
         progress = int((secs_since_start / timer_max) * ncols)
-        progress_bar = f"{name} ["
-        progress_bar += ("#" * progress) + (" " * (ncols-progress))
-        progress_bar += "]"
+        progress_bar = f"{name} {PROGRESS_CHARS[0]}"
+        progress_bar += (PROGRESS_CHARS[1] * progress) + (PROGRESS_CHARS[2] * (ncols-progress))
+        progress_bar += PROGRESS_CHARS[3]
 
         print(f"\033[2K\033[{color}m{progress_bar}\033[0m")
 
