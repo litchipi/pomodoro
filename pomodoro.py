@@ -53,11 +53,11 @@ class Pomodoro:
         self.reps = args.reps
         self.refresh_time = args.refresh
         self.debug = args.debug
+        self.phase = args.phase
 
         self.secs_work = 0
 
         self.init = True
-        self.phase = 0
         self.phase_start = 0
         self.phase_time = 0.0
         self.end_phase_warning = False
@@ -197,6 +197,7 @@ def parse_args():
 
     parser.add_argument("--refresh", "-r", help="Amount of time between refresh (in secs)", type=float, default=0.5)
     parser.add_argument("--debug", "-d", help="Enable debug logs in the screen output", action="store_true")
+    parser.add_argument("--phase", help="Start directly to the given phase number", type=int, default=0)
 
     return parser.parse_args()
 
