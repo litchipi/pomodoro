@@ -157,17 +157,23 @@ class Pomodoro:
             for (logt, line) in self.logs[-ndisp:]:
                 print(f"\033[2K\033[{LOGTIME_COLOR}m{logt}\t\033[{LOG_COLOR}m{line}\033[0m")
 
-    def send_notification(self, message):
-        playsound(NOTIFY_SOUND)
-        DBUS_OBJ.Notify(
-            "Pomodoro",
-            0,
-            os.path.join(ASSETS_DIR, "icon.png"),
-            message, message,
-            [],
-            {"urgency": 1},
-            10000
-        )
+    def send_notification(self, message, nretry=1, nretry_max=5):
+        try:
+            DBUS_OBJ.Notify(
+                "Pomodoro",
+                0,
+                os.path.join(ASSETS_DIR, "icon.png"),
+                message, message,
+                [],
+                {"urgency": 1},
+                10000
+            )
+            playsound(NOTIFY_SOUND)
+        except dbus.exceptions.DBusException as err:
+            if nretry == nretry_max:
+                raise Exception(err)
+            self.log("Got exception when performing notification: {err}", "retrying...", nretry, nretry_max)
+            self.send_notification(message, nretry=nretry+1, nretry_max=nretry_max)
 
     def log(self, *args):
         self.logs.append((time.ctime(), " ".join([str(s) for s in args])))
