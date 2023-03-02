@@ -28,6 +28,12 @@ LOGS_HISTORY_MAX = 500
 
 PROGRESS_CHARS = ["▐", "█", "░", "▌"]
 
+DEFAULT_TIMES = {
+    "work": 25,
+    "pause": 5,
+    "big_pause": 30,
+}
+
 def playsound(file, wait=False):
     wave_obj = simpleaudio.WaveObject.from_wave_file(file)
     play_obj = wave_obj.play()
@@ -40,10 +46,11 @@ def alarm_loop(evt):
 
 class Pomodoro:
     def __init__(self, args):
-        self.work = args.work
-        self.pause = args.pause
+        # Convert the times to seconds
+        self.work = args.work * 60
+        self.pause = args.pause * 60
+        self.big_pause = args.big_pause * 60
         self.reps = args.reps
-        self.big_pause = args.big_pause
         self.refresh_time = args.refresh
         self.debug = args.debug
 
@@ -183,12 +190,14 @@ class Pomodoro:
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--work", "-w", help="Work time to set", type=int, default=25*60)
-    parser.add_argument("--pause", "-p", help="Break time to set", type=int, default=5*60)
+    parser.add_argument("--work", "-w", help="Work time to set (in mins)", type=int, default=DEFAULT_TIMES["work"])
+    parser.add_argument("--pause", "-p", help="Break time to set (in mins)", type=int, default=DEFAULT_TIMES["pause"])
+    parser.add_argument("--big-pause", "-b", help="Big pause time to set (in mins)", type=int, default=DEFAULT_TIMES["big_pause"])
     parser.add_argument("--reps", "-n", help="Repetitions before having a big pause", type=int, default=3)
-    parser.add_argument("--big-pause", "-b", help="Big pause time to set", type=int, default=15*60)
-    parser.add_argument("--refresh", "-r", help="Amount of time between refresh", type=float, default=0.5)
+
+    parser.add_argument("--refresh", "-r", help="Amount of time between refresh (in secs)", type=float, default=0.5)
     parser.add_argument("--debug", "-d", help="Enable debug logs in the screen output", action="store_true")
+
     return parser.parse_args()
 
 def main():
