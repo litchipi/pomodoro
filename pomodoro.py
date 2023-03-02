@@ -170,7 +170,7 @@ class Pomodoro:
         )
 
     def log(self, *args):
-        self.logs.append((time.ctime(), " ".join(args)))
+        self.logs.append((time.ctime(), " ".join([str(s) for s in args])))
 
     def trigger_end_phase_warning(self):
         if self.is_work_phase():
