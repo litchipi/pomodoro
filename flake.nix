@@ -10,7 +10,6 @@
 
     python_version = pkgs.python310;
     python_packages_version = pkgs.python310Packages;
-    custom_pkgs = (import ./python-packages.nix pkgs python_packages_version);
     pythonpkg = python_version.withPackages (p: with p; [
       simpleaudio
       dbus-python
@@ -24,6 +23,25 @@
     apps.${system}.default = {
       type = "app";
       program = "${start}";
+    };
+    packages.${system}.default = pkgs.stdenv.mkDerivation rec {
+      name = "pomodoro";
+      src = ./.;
+
+      phases = "installPhase";
+
+      installPhase = let
+        script = pkgs.writeShellApplication {
+          inherit name;
+          text = ''
+            cd ${src}
+            ${pythonpkg}/bin/python ./pomodoro.py "$@"
+          '';
+          runtimeInputs = [];
+        };
+      in ''
+        ln -s ${script} $out
+      '';
     };
   };
 }
