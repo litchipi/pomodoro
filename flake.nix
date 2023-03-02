@@ -19,12 +19,7 @@
       ${pythonpkg}/bin/python ./pomodoro.py $@
     '';
 
-  in {
-    apps.${system}.default = {
-      type = "app";
-      program = "${start}";
-    };
-    packages.${system}.default = pkgs.stdenv.mkDerivation rec {
+    deriv = pkgs.stdenv.mkDerivation rec {
       name = "pomodoro";
       src = ./.;
 
@@ -42,6 +37,15 @@
       in ''
         ln -s ${script} $out
       '';
+    };
+  in {
+    apps.${system}.default = {
+      type = "app";
+      program = "${start}";
+    };
+    packages.${system}.default = deriv;
+    overlays.default = final: prev: {
+      pomodoro = deriv;
     };
   };
 }
