@@ -211,7 +211,7 @@ def parse_args():
 def main():
     args = parse_args()
     pomodoro = Pomodoro(args)
-    if args.wait():
+    if args.wait:
         input("Press enter to start the pomodoro session")
     pomodoro.start()
 
