@@ -204,12 +204,15 @@ def parse_args():
     parser.add_argument("--refresh", "-r", help="Amount of time between refresh (in secs)", type=float, default=0.5)
     parser.add_argument("--debug", "-d", help="Enable debug logs in the screen output", action="store_true")
     parser.add_argument("--phase", help="Start directly to the given phase number", type=int, default=0)
+    parser.add_argument("--wait", help="Wait for user input before starting the session", action="store_true")
 
     return parser.parse_args()
 
 def main():
     args = parse_args()
     pomodoro = Pomodoro(args)
+    if args.wait():
+        input("Press enter to start the pomodoro session")
     pomodoro.start()
 
 if __name__ == "__main__":
