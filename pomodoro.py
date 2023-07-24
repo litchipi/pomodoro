@@ -11,8 +11,14 @@ import subprocess
 import simpleaudio
 import dbus
 
-DBUS_OBJ = dbus.SessionBus().get_object("org.freedesktop.Notifications", "/org/freedesktop/Notifications")
-DBUS_OBJ = dbus.Interface(DBUS_OBJ, "org.freedesktop.Notifications")
+try:
+    DBUS_OBJ = dbus.SessionBus().get_object("org.freedesktop.Notifications", "/org/freedesktop/Notifications")
+    DBUS_OBJ = dbus.Interface(DBUS_OBJ, "org.freedesktop.Notifications")
+    notifications = True
+except Exception as err:
+    print(f"Unable to start Dbus object: {err}")
+    print("Notifications on desktop will not get displayed")
+    notifications = False
 
 ASSETS_DIR=os.path.dirname(os.path.abspath(__file__))
 NOTIFY_SOUND=os.path.join(ASSETS_DIR, "notify.wav")
@@ -93,12 +99,13 @@ class Pomodoro:
     def end_phase(self):
         if self.is_work_phase():
             self.secs_work += self.work
-        if self.is_work_phase():
-            self.send_notification("Work is finished, take a break now")
-        elif self.is_pause_phase():
-            self.send_notification("Pause is finished, let's go back to work now")
-        elif self.is_big_pause_phase():
-            self.send_notification("Big pause is finished, let's go back to work now")
+        if notifications:
+            if self.is_work_phase():
+                self.send_notification("Work is finished, take a break now")
+            elif self.is_pause_phase():
+                self.send_notification("Pause is finished, let's go back to work now")
+            elif self.is_big_pause_phase():
+                self.send_notification("Big pause is finished, let's go back to work now")
         self.trigger_alarm()
 
     def start_phase(self):
@@ -179,12 +186,13 @@ class Pomodoro:
         self.logs.append((time.ctime(), " ".join([str(s) for s in args])))
 
     def trigger_end_phase_warning(self):
-        if self.is_work_phase():
-            self.send_notification("Work phase soon finished, save your work !")
-        elif self.is_pause_phase():
-            self.send_notification("Pause soon finished, prepare to go back to work !")
-        elif self.is_big_pause_phase():
-            self.send_notification("Big pause soon finished, prepare to go back to work !")
+        if notifications:
+            if self.is_work_phase():
+                self.send_notification("Work phase soon finished, save your work !")
+            elif self.is_pause_phase():
+                self.send_notification("Pause soon finished, prepare to go back to work !")
+            elif self.is_big_pause_phase():
+                self.send_notification("Big pause soon finished, prepare to go back to work !")
 
     def trigger_alarm(self):
         os.system("clear")
